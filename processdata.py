@@ -1,5 +1,3 @@
-import matplotlib.pyplot as plt
-
 data=[]
 goal = 1000000
 
@@ -14,7 +12,7 @@ for line in lines:
 instant = 0
 one = 0
 two = 0
-moar = 0
+moreThanTwo = 0
 curr = 0
 
 for pct in data:
@@ -28,26 +26,13 @@ for pct in data:
             two+=1
             instant+=1
         else:
-            moar+=1
+            moreThanTwo+=1
             instant+=1
-            print(curr)
+            print(f"Length of less than 5/6 participation phase: {curr}")
         curr = 0
     else:
         curr += 1
 
-print(f'{instant} {one} {two} {moar}')
-print(f'{instant/len(data)} {one/len(data)}')
-
-
-# Create a boxplot
-#plt.violinplot(data)
-
-# Customize the plot
-#plt.title("Boxplot Example")
-#plt.xlabel("Category")
-#plt.ylabel("Values")
-
-# Show the plot
-plt.show()
-
+print(f'Finality time: Instant: {instant} One Block: {one} Two Blocks: {two} More than Two Blocks: {moreThanTwo}')
+print(f'Instant finality fraction: {instant/len(data)} One Block delay fraction: {one/len(data)}')
 

@@ -1,39 +1,25 @@
 import time
 
 import requests
-import bech32
-import hashlib
-import base64
-
 from cosmos.apikeys import api_keys
 
-
-def bech32_to_base64(bech32_address):
-
-    # Decode the Bech32 address to raw bytes
-    hrp, data = bech32.bech32_decode(bech32_address)
-    raw_bytes = bech32.convertbits(data, 5, 8, pad=False)
-
-    return base64.b64encode(bytes(raw_bytes)).decode('utf-8')
-start = 22877994 #21983096
+start = 21983096
 end = 22983096
 
-f = open("tx2.txt", "a")
+f = open("tx.txt", "a")
 
-
-index = 0;
+index = 0
 
 ignore = ['/ibc.core.client.v1.MsgUpdateClient', '/ibc.core.channel.v1.MsgAcknowledgement', '/cosmos.gov.v1beta1.MsgVote', '/ibc.core.channel.v1.MsgRecvPacket']
 
 for i in range(start, end):
     suffix1 = f"/cosmos/tx/v1beta1/txs/block/{i}"
 
-    #todo: try catch around this
     response = None
     try:
         response = requests.request("GET", api_keys[index % len(api_keys)] + suffix1, headers={}, data={})
     except:
-        print("woopsy")
+        print("error")
         api_keys.pop(index % len(api_keys))
 
     if response.status_code == 429:
@@ -46,22 +32,9 @@ for i in range(start, end):
         try:
             response = requests.request("GET", api_keys[index % len(api_keys)] + suffix1, headers={}, data={})
         except:
-            print("woopsy")
+            print("error")
             api_keys.pop(index % len(api_keys))
         index += 1
-
-
-    #txs-> body->messages->
-    #@type = '/ibc.applications.transfer.v1.MsgTransfer'
-    # token->amount (only if "uatom")
-
-    #'/cosmos.bank.v1beta1.MsgSend'
-    # amount-> (only if "uatom")
-    # amount-> {'amount': '150000000', 'denom': 'ibc/F663521BF1836B00F5F177680F74BFB9A8B5654A694D0D2BC249E03CF2509013'}
-
-    # value translation = 1090 -> 0.001090 (remove 6 zeros)
-
-    # Append all the validator addresses that voted for this block here.
 
     jsonresponse = response.json()
     blocktime = jsonresponse['block']['header']['time']
@@ -101,11 +74,6 @@ for i in range(start, end):
     print(f"{i} {blocktime} {thisblockamount}")
     f.write(f"{i} {blocktime} {thisblockamount}\n")
 
-    # Cycle through naturally as well, not only on failure
     index += 1
 
 f.close()
-#print(response.text)
-
-
-
